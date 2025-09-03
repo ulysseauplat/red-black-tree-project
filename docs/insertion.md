@@ -61,8 +61,8 @@ We are going to use this strategy to insert a node **Z**: first we insert **Z** 
 1. Z is the root  
 2. Z's parent is black  
 3. Z's parent is red and Z's uncle is red  
-4. Z’s uncle is black and Z and Z’s parent are aligned  
-5. Z’s uncle is black and Z and Z’s parent are opposite children (forming a triangle)  
+4. Z’s parent is black, uncle is black, Z and Z’s parent are aligned  
+5. Z’s parent is black, uncle is black, Z and Z’s parent are opposite children (forming a triangle)  
 
 ---
 
@@ -85,11 +85,11 @@ We are going to use this strategy to insert a node **Z**: first we insert **Z** 
 <div style="display: flex; gap: 20px; align-items: flex-start;">
     <figure style="margin: 0;">
         <img src="img/case1_2.png" alt="case 1_1" width="250"/>
-        <figcaption style="text-align: center;">Case 1-1</figcaption>
+        <figcaption style="text-align: center;">Initial Tree</figcaption>
     </figure>
     <figure style="margin: 0;">
         <img src="img/case1_1.png" alt="case 1_2" width="250"/>
-        <figcaption style="text-align: center;">Case 1-2</figcaption>
+        <figcaption style="text-align: center;">Recoloring</figcaption>
     </figure>
 </div>
 
@@ -121,14 +121,15 @@ We are going to use this strategy to insert a node **Z**: first we insert **Z** 
 <div style="display: flex; gap: 20px; align-items: flex-start;">
     <figure style="margin: 0;">
         <img src="img/case2_2.png" alt="Triangle case step 1" width="250"/>
-        <figcaption style="text-align: center;">Triangle case step 1</figcaption>
+        <figcaption style="text-align: center;">Initial tree</figcaption>
     </figure>
     <figure style="margin: 0;">
         <img src="img/case2_1.png" alt="Triangle case step 2" width="250"/>
-        <figcaption style="text-align: center;">Triangle case step 2</figcaption>
+        <figcaption style="text-align: center;">Rotating</figcaption>
     </figure>
 </div>
 
+---
 
 After those changes, we may have created new color problems higher up in the tree. To fix this, we keep moving upward and applying the same process until all Red-Black properties are satisfied.
 
