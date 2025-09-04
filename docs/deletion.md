@@ -111,4 +111,42 @@ We **move the extra black up** by coloring the parent black and the sibling red.
   </figure>
 </div>
 
-> **Note:** In the example above, the tree do not satisfy Red-Black Tree properties, but this is fine. The subtrees of a Red-Black Tree are not necessarily Red-Black Trees themselves. The key point is that we added a new black node to fix the double black issue so that the overall Red-Black Tree is valid.
+> **Note1 :** In the example above, the tree do not satisfy Red-Black Tree properties, but this is fine. The subtrees of a Red-Black Tree are not necessarily Red-Black Trees themselves. The key point is that we added a new black node to fix the double black issue so that the overall Red-Black Tree is valid.
+
+> **Note2 :** All what we saw here works when x is a left child. If it's a right child it's the same process but we need to change the rotation direction and the nodes we're looking at.
+
+
+Now we can write this pseudo-code:
+
+```text
+y = node to delete
+x = child that replaces y
+w = sibling of x
+
+BST_delete(y)
+
+if y.color == BLACK:
+    while x != root and x.color == BLACK:
+        w = sibling of x
+        if w.color == RED:                            # case 1
+            w.color = x.parent.color
+            x.parent.color = RED
+            left_rotate(x.parent)
+            w = sibling of x
+        if w.color == BLACK and w.left.color == BLACK and w.right.color == BLACK:   # case 2
+            w.color = RED
+            x = x.parent
+        else:
+            if w.color == BLACK and w.right.color == BLACK and w.left.color == RED: # case 3
+                w.left.color = BLACK
+                w.color = RED
+                right_rotate(w)
+                w = sibling of x
+            if w.color == BLACK and w.right.color == RED:                           # case 4
+                w.color = x.parent.color
+                x.parent.color = BLACK
+                w.right.color = BLACK
+                left_rotate(x.parent)
+                x = root
+    x.color = BLACK
+```
