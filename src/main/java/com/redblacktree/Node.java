@@ -17,6 +17,7 @@ public class Node
             this.color = RED;
             left = right = parent = null;
         }
+        
 
         public int getData() {
             return data;
