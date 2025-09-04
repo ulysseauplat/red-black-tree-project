@@ -139,7 +139,7 @@ Now we can write this pseudo code for insertion :
 ```text
 # Variables
 
-B = root_of_tree                 # root of the Red-Black Tree
+B = parent_of(A)
 Z = node_to_insert               # the new node we want to insert
 A = parent_of(Z)                 # parent of Z
 C = uncle_of(Z)                  # uncle of Z
@@ -149,7 +149,7 @@ BST_insert(B, Z)
 Z.color = RED                    # new nodes are always red
 
 # Step 2: Fix Red-Black properties
-while Z != B and A.color == RED:
+while Z != tree.root and A.color == RED:
 
     C = uncle_of(Z)
 
@@ -163,7 +163,7 @@ while Z != B and A.color == RED:
         if (Z is right child of A and A is left child) 
            or (Z is left child of A and A is right child):   # triangle
             Z = A
-            rotate(Z)                        # rotate at parent to align
+            rotate(Z)                        # rotate (left or right) at parent to align
 
         # now aligned (both left or both right)
         swap_colors(A, A.parent)             # swap colors of parent & grandparent
