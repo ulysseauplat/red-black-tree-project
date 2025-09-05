@@ -1,4 +1,10 @@
 package com.redblacktree;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Random;  // if you use random numbers
+import java.util.Set;
+import java.util.HashSet;
 
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
@@ -248,5 +254,53 @@ public class RedBlackTreeTest {
         assertFalse(tree.checkProperty4(root, 2, 0));
 
     }
+
+    @Test
+void stressTestRedBlackTree() {
+    RedBlackTree tree = new RedBlackTree();
+    int N = 10000;
+    Random rand = new Random();
+
+    // Generate unique random values
+    Set<Integer> set = new HashSet<>();
+    while (set.size() < N) set.add(rand.nextInt(N * 10));
+    List<Integer> values = new ArrayList<>(set);
+
+    for (int i = 0; i < values.size(); i++) {
+        int value = values.get(i);
+        try {
+            tree.insert(value);
+            if (!tree.checkProperties()) {
+                throw new AssertionError("RB properties violated");
+            }
+        } catch (AssertionError e) {
+            System.out.println("\n=== ERROR DURING INSERTION ===");
+            System.out.println("Insertion #" + (i + 1) + "/" + N + ": " + value);
+            tree.print(tree.getRoot());  // Print tree structure
+            throw e; // Re-throw to fail the test
+        }
+    }
+
+    delete nodes in random order
+    Collections.shuffle(values);
+    for (int i = 0; i < values.size(); i++) {
+        int value = values.get(i);
+        try {
+            tree.delete(value);
+            if (!tree.checkProperties()) {
+                throw new AssertionError("RB properties violated after deletion");
+            }
+        } catch (AssertionError e) {
+            System.out.println("\n=== ERROR DURING DELETION ===");
+            System.out.println("Deletion #" + (i + 1) + "/" + N + ": " + value);
+            tree.print(tree.getRoot());  // Print tree structure
+            throw e; // Re-throw to fail the test
+        }
+    }
+
+    // Final check: tree should be empty
+    assertEquals(tree.getNIL(), tree.getRoot());
+}
+
 
 }
