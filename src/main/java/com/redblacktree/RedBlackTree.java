@@ -69,6 +69,10 @@ public class RedBlackTree {
 
     public void insert(int data) {
 
+            /**
+            * Insert a new node with the given data
+            * */
+
         Node newNode = new Node(data);
         newNode.setLeft(NIL);
         newNode.setRight(NIL);
@@ -104,29 +108,34 @@ public class RedBlackTree {
     }
 
     public void fixInsert(Node Z) {
-        while (Z.getParent().getColor() == Node.RED) {
-            if (Z == this.root) {
+        
+        /**
+         * Fix the tree after insertion of a node Z
+         */
+
+        while (Z.getParent().getColor() == Node.RED) {  // While the parent of Z is red, if the parent is black its case 2 we have nothing to do
+            if (Z == this.root) {   // case 1
                 Z.setColor(Node.BLACK);
             }
-            else if (Z.getParent() == Z.getParent().getParent().getLeft()) {
-                Node y = Z.getParent().getParent().getRight();
-                if (y.getColor() == Node.RED) {
+            else if (Z.getParent() == Z.getParent().getParent().getLeft()) { // If the parent is a left child
+                Node y = Z.getParent().getParent().getRight();  // y is the uncle of Z
+                if (y.getColor() == Node.RED) {     // case 3
                     Z.getParent().setColor(Node.BLACK);
                     y.setColor(Node.BLACK);
                     Z.getParent().getParent().setColor(Node.RED);
-                    Z = Z.getParent().getParent();
-                } else {
-                    if (Z == Z.getParent().getRight()) {
+                    Z = Z.getParent().getParent();  // Move Z up the tree
+                } else {        
+                    if (Z == Z.getParent().getRight()) {    // case 4
                         Z = Z.getParent();
                         rotateLeft(Z);
-                    }
+                    }                                      // case 5, we don't use else because if case 4 is true, we need to do case 5 afterwards
                     Z.getParent().setColor(Node.BLACK);
                     Z.getParent().getParent().setColor(Node.RED);
                     rotateRight(Z.getParent().getParent());
                 }
-            } else {
+            } else {        // If the parent is a right child
                 Node y = Z.getParent().getParent().getLeft();
-                if (y.getColor() == Node.RED) {
+                if (y.getColor() == Node.RED) {   
                     Z.getParent().setColor(Node.BLACK);
                     y.setColor(Node.BLACK);
                     Z.getParent().getParent().setColor(Node.RED);
@@ -149,10 +158,126 @@ public class RedBlackTree {
         }
     }
 
+    
     public void delete(int data) {
+        Node z = search(data);
+        if (z == NIL) {
+            return; // Node not found
+        }
 
+        Node y = z;
+        Node x;
+        boolean yOriginalColor = y.getColor();
+
+        // Standard BST delete with the color change
+
+        if (z.getLeft() == NIL) {
+            x = z.getRight();
+            transplant(z, z.getRight());
+        } else if (z.getRight() == NIL) {
+            x = z.getLeft();
+            transplant(z, z.getLeft());
+        } else {
+            y = minimum(z.getRight());
+            yOriginalColor = y.getColor();
+            x = y.getRight();
+            if (y.getParent() == z) {
+                x.setParent(y);
+            } else {
+                transplant(y, y.getRight());
+                y.setRight(z.getRight());
+                y.getRight().setParent(y);
+            }
+            transplant(z, y);
+            y.setLeft(z.getLeft());
+            y.getLeft().setParent(y);
+            y.setColor(z.getColor());
+        }
+
+        if (yOriginalColor == Node.BLACK) {
+            delete_fixup(x);
+        }
     }
 
+    public void delete_fixup(Node x) {
+        while (x != root && x.getColor() == Node.BLACK) {   // While x is not the root and x is black
+            if (x == x.getParent().getLeft()) {             // If x is a left child 
+                Node w = x.getParent().getRight();
+                if (w.getColor() == Node.RED) {              // case 1
+                    w.setColor(Node.BLACK);
+                    x.getParent().setColor(Node.RED);
+                    rotateLeft(x.getParent());
+                    w = x.getParent().getRight();
+                }
+                if (w.getLeft().getColor() == Node.BLACK && w.getRight().getColor() == Node.BLACK) {    // case 2
+                    w.setColor(Node.RED);
+                    x = x.getParent();
+                } else {                                                                
+                    if (w.getRight().getColor() == Node.BLACK) {    // case 3
+                        w.getLeft().setColor(Node.BLACK);
+                        w.setColor(Node.RED);
+                        rotateRight(w);
+                        w = x.getParent().getRight();
+                    }
+                    w.setColor(x.getParent().getColor());   // case 4
+                    x.getParent().setColor(Node.BLACK);
+                    w.getRight().setColor(Node.BLACK);
+                    rotateLeft(x.getParent());
+                    x = root;
+                }
+            } else {    // same thing on the other side
+                Node w = x.getParent().getLeft();
+                if (w.getColor() == Node.RED) {
+                    w.setColor(Node.BLACK);
+                    x.getParent().setColor(Node.RED);
+                    rotateRight(x.getParent());
+                    w = x.getParent().getLeft();
+                }
+                if (w.getRight().getColor() == Node.BLACK && w.getLeft().getColor() == Node.BLACK) {
+                    w.setColor(Node.RED);
+                    x = x.getParent();
+                } else {
+                    if (w.getLeft().getColor() == Node.BLACK) {
+                        w.getRight().setColor(Node.BLACK);
+                        w.setColor(Node.RED);
+                        rotateLeft(w);
+                        w = x.getParent().getLeft();
+                    }
+                    w.setColor(x.getParent().getColor());
+                    x.getParent().setColor(Node.BLACK);
+                    w.getLeft().setColor(Node.BLACK);
+                    rotateRight(x.getParent());
+                    x = root;
+                }
+            }
+        }
+        x.setColor(Node.BLACK);
+    }
+
+    private void transplant(Node u, Node v) {
+        /**
+         * Replaces the subtree rooted at node u with the subtree rooted at node v
+         */
+        if (u.getParent() == null) {
+            root = v;
+        } else if (u == u.getParent().getLeft()) {
+            u.getParent().setLeft(v);
+        } else {
+            u.getParent().setRight(v);
+        }
+        v.setParent(u.getParent());
+    }
+
+    private Node minimum(Node node) {
+        /**
+         * Return the node with the minimum key in the subtree rooted at the given node
+         */
+        
+        while (node.getLeft() != NIL) {
+            node = node.getLeft();
+        }
+        return node;
+    }
 
     public Node getRoot() {
         return root;
