@@ -261,46 +261,30 @@ void stressTestRedBlackTree() {
     int N = 10000;
     Random rand = new Random();
 
-    // Generate unique random values
+    List<Integer> values = new ArrayList<>();
     Set<Integer> set = new HashSet<>();
     while (set.size() < N) set.add(rand.nextInt(N * 10));
-    List<Integer> values = new ArrayList<>(set);
+    values.addAll(set);
 
     for (int i = 0; i < values.size(); i++) {
         int value = values.get(i);
-        try {
-            tree.insert(value);
-            if (!tree.checkProperties()) {
-                throw new AssertionError("RB properties violated");
-            }
-        } catch (AssertionError e) {
-            System.out.println("\n=== ERROR DURING INSERTION ===");
-            System.out.println("Insertion #" + (i + 1) + "/" + N + ": " + value);
-            tree.print(tree.getRoot());  // Print tree structure
-            throw e; // Re-throw to fail the test
-        }
+        System.out.println("Inserting (" + (i+1) + "/" + N + "): " + value); // <-- print index & value
+        tree.insert(value);
+        assertTrue(tree.checkProperties(), "RB properties violated after insertion #" + (i+1) + ": " + value);
     }
 
-    delete nodes in random order
+    // Optional: shuffle and delete nodes
     Collections.shuffle(values);
     for (int i = 0; i < values.size(); i++) {
         int value = values.get(i);
-        try {
-            tree.delete(value);
-            if (!tree.checkProperties()) {
-                throw new AssertionError("RB properties violated after deletion");
-            }
-        } catch (AssertionError e) {
-            System.out.println("\n=== ERROR DURING DELETION ===");
-            System.out.println("Deletion #" + (i + 1) + "/" + N + ": " + value);
-            tree.print(tree.getRoot());  // Print tree structure
-            throw e; // Re-throw to fail the test
-        }
+        System.out.println("Deleting (" + (i+1) + "/" + N + "): " + value);
+        tree.delete(value);
+        assertTrue(tree.checkProperties(), "RB properties violated after deletion #" + (i+1) + ": " + value);
     }
 
-    // Final check: tree should be empty
-    assertEquals(tree.getNIL(), tree.getRoot());
+    assertEquals(tree.getNIL(), tree.getRoot()); // tree should be empty at the end
 }
+
 
 
 }
