@@ -13,7 +13,12 @@ public class RedBlackTree {
         root = NIL;
     }
 
-    public Node rotateLeft(Node x) {
+    public Node rotateLeft(Node x) {    
+
+        /** 
+         * rotate left around x and then return the new root
+         * */
+
         Node y = x.getRight();
         y.setParent(x.getParent());
         x.setRight(y.getLeft());
@@ -25,7 +30,11 @@ public class RedBlackTree {
         return y;
     }
 
-    public Node rotateRight(Node x) {
+    public Node rotateRight(Node x) {   
+        /** 
+         * rotate right around x and then return the new root
+         * */
+
         Node y = x.getLeft();
         y.setParent(x.getParent());
         x.setLeft(y.getRight());
@@ -38,15 +47,109 @@ public class RedBlackTree {
     }
 
     
-    public void search(int date) {
+    public Node search(int data) {      
+        /** 
+         * return the node if found, otherwise return the NIL node
+         * */
+        Node curr = this.root;
+        while (curr.getData() != data && curr != NIL) {
+
+            if (curr.getData() < data) {
+                curr = curr.getRight();
+            }
+
+            else {
+                curr = curr.getLeft();
+            }
+            
+        }
+        return curr;        
 
     }
 
-    public void insert(int date) {
+    public void insert(int data) {
+
+        Node newNode = new Node(data);
+        newNode.setLeft(NIL);
+        newNode.setRight(NIL);
+
+        if (root == NIL) {
+            newNode.setColor(Node.BLACK);
+            root = newNode;
+            return;
+        }
+
+        Node curr = root;
+        Node parent = null;
+
+        while (curr != NIL) {
+            parent = curr;
+            if (newNode.getData() < curr.getData()) {
+                curr = curr.getLeft();
+            } else {
+                curr = curr.getRight();
+            }
+        }
+
+        newNode.setParent(parent);
+        if (newNode.getData() < parent.getData()) {
+            parent.setLeft(newNode);
+        } else {
+            parent.setRight(newNode);
+        }
+
+        // Fix the tree
+        fixInsert(newNode);
 
     }
 
-    public void delete(int date) {
+    public void fixInsert(Node Z) {
+        while (Z.getParent().getColor() == Node.RED) {
+            if (Z == this.root) {
+                Z.setColor(Node.BLACK);
+            }
+            else if (Z.getParent() == Z.getParent().getParent().getLeft()) {
+                Node y = Z.getParent().getParent().getRight();
+                if (y.getColor() == Node.RED) {
+                    Z.getParent().setColor(Node.BLACK);
+                    y.setColor(Node.BLACK);
+                    Z.getParent().getParent().setColor(Node.RED);
+                    Z = Z.getParent().getParent();
+                } else {
+                    if (Z == Z.getParent().getRight()) {
+                        Z = Z.getParent();
+                        rotateLeft(Z);
+                    }
+                    Z.getParent().setColor(Node.BLACK);
+                    Z.getParent().getParent().setColor(Node.RED);
+                    rotateRight(Z.getParent().getParent());
+                }
+            } else {
+                Node y = Z.getParent().getParent().getLeft();
+                if (y.getColor() == Node.RED) {
+                    Z.getParent().setColor(Node.BLACK);
+                    y.setColor(Node.BLACK);
+                    Z.getParent().getParent().setColor(Node.RED);
+                    Z = Z.getParent().getParent();
+                } else {
+                    if (Z == Z.getParent().getLeft()) {
+                        Z = Z.getParent();
+                        rotateRight(Z);
+                    }
+                    Z.getParent().setColor(Node.BLACK);
+                    Z.getParent().getParent().setColor(Node.RED);
+                    rotateLeft(Z.getParent().getParent());
+                }
+            }
+            
+
+
+            
+
+        }
+    }
+
+    public void delete(int data) {
 
     }
 
