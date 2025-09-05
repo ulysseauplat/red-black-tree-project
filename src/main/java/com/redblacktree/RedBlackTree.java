@@ -13,6 +13,22 @@ public class RedBlackTree {
         root = NIL;
     }
 
+    public static void main(String[] args) {
+        RedBlackTree tree = new RedBlackTree();
+        tree.insert(10);
+        tree.insert(20);
+        tree.insert(5);
+        tree.insert(15);
+
+        tree.print(tree.getRoot());
+        System.out.println("Tree properties valid: " + tree.checkProperties());
+        tree.delete(10);
+        System.out.println("After deleting 10:");
+        tree.print(tree.getRoot());
+        System.out.println("Tree properties valid: " + tree.checkProperties());
+        
+    }
+
     public Node rotateLeft(Node x) {    
 
         /** 
@@ -84,7 +100,7 @@ public class RedBlackTree {
         }
 
         Node curr = root;
-        Node parent = null;
+        Node parent = NIL;
 
         while (curr != NIL) {
             parent = curr;
@@ -113,11 +129,11 @@ public class RedBlackTree {
          * Fix the tree after insertion of a node Z
          */
 
-        while (Z.getParent().getColor() == Node.RED) {  // While the parent of Z is red, if the parent is black its case 2 we have nothing to do
-            if (Z == this.root) {   // case 1
-                Z.setColor(Node.BLACK);
+        while (Z.getParent() != null && Z.getParent().getColor() == Node.RED) {  // While the parent of Z is red and its not the root
+            if (Z.getParent().getParent() == null) {   // case 1: Z's parent is root
+                break;
             }
-            else if (Z.getParent() == Z.getParent().getParent().getLeft()) { // If the parent is a left child
+            if (Z.getParent() == Z.getParent().getParent().getLeft()) { // If the parent is a left child
                 Node y = Z.getParent().getParent().getRight();  // y is the uncle of Z
                 if (y.getColor() == Node.RED) {     // case 3
                     Z.getParent().setColor(Node.BLACK);
@@ -127,11 +143,13 @@ public class RedBlackTree {
                 } else {        
                     if (Z == Z.getParent().getRight()) {    // case 4
                         Z = Z.getParent();
-                        rotateLeft(Z);
-                    }                                      // case 5, we don't use else because if case 4 is true, we need to do case 5 afterwards
+                        Node rotated = rotateLeft(Z);
+                        if (rotated.getParent() == null) root = rotated;
+                    }                                      // case 5
                     Z.getParent().setColor(Node.BLACK);
                     Z.getParent().getParent().setColor(Node.RED);
-                    rotateRight(Z.getParent().getParent());
+                    Node rotated = rotateRight(Z.getParent().getParent());
+                    if (rotated.getParent() == null) root = rotated;
                 }
             } else {        // If the parent is a right child
                 Node y = Z.getParent().getParent().getLeft();
@@ -143,19 +161,17 @@ public class RedBlackTree {
                 } else {
                     if (Z == Z.getParent().getLeft()) {
                         Z = Z.getParent();
-                        rotateRight(Z);
+                        Node rotated = rotateRight(Z);
+                        if (rotated.getParent() == null) root = rotated;
                     }
                     Z.getParent().setColor(Node.BLACK);
                     Z.getParent().getParent().setColor(Node.RED);
-                    rotateLeft(Z.getParent().getParent());
+                    Node rotated = rotateLeft(Z.getParent().getParent());
+                    if (rotated.getParent() == null) root = rotated;
                 }
             }
-            
-
-
-            
-
         }
+        root.setColor(Node.BLACK);
     }
 
     
@@ -278,6 +294,83 @@ public class RedBlackTree {
         }
         return node;
     }
+
+    public boolean checkProperties() {
+        /**
+         * Check if the tree satisfies the red-black properties
+         */
+        //property 1: Every node is either red or black is always true with our data structure
+        //property 2: the root is black        
+        if (root.getColor() != Node.BLACK) {
+            return false;
+        }
+        //property 3: a red node cannot have red children
+        if (!checkProperty3(root)) {
+            return false;
+        }
+        //property 4: every path from a node to its descendant NIL nodes must have the same number of black nodes
+        int blackCount = 0;
+        Node curr = root;
+        while (curr != NIL) {
+            if (curr.getColor() == Node.BLACK) {
+                blackCount++;
+            }
+            curr = curr.getLeft();
+        }
+        if (!checkProperty4(root, blackCount, 0)) { 
+            return false;
+        }
+        //property 5: all leaves (NIL nodes) are black is always true with our data structure
+        return true;
+    }
+
+    public boolean checkProperty4(Node node, int blackCount, int pathBlackCount) {
+        if (node == NIL) {
+            return blackCount == pathBlackCount;
+        }
+        if (node.getColor() == Node.BLACK) {
+            pathBlackCount++;
+        }
+        return checkProperty4(node.getLeft(), blackCount, pathBlackCount) &&
+               checkProperty4(node.getRight(), blackCount, pathBlackCount);
+    }
+
+    public boolean checkProperty3(Node node) {
+        boolean colour = node.getColor();
+        if (node == NIL) {
+            return true;
+        }
+
+        else if (colour == Node.RED) {
+            if (node.getLeft().getColor() == Node.RED || node.getRight().getColor() == Node.RED) {
+                return false;
+            }
+            else {
+                return this.checkProperty3(node.getLeft()) && this.checkProperty3(node.getRight());
+            }
+        }
+        else {
+            return this.checkProperty3(node.getLeft()) && this.checkProperty3(node.getRight());
+        }
+    }
+    
+    public void print(Node node) {
+        printHelper(node, "", true);
+    }
+
+    private void printHelper(Node node, String prefix, boolean isTail) {
+        if (node == NIL) {
+            System.out.println(prefix + (isTail ? "└── " : "├── ") + "NIL");
+            return;
+        }
+        System.out.println(prefix + (isTail ? "└── " : "├── ") + node.getData() + (node.getColor() == Node.RED ? " (R)" : " (B)"));
+        if (node.getLeft() != NIL || node.getRight() != NIL) {
+            printHelper(node.getLeft(), prefix + (isTail ? "    " : "│   "), false);
+            printHelper(node.getRight(), prefix + (isTail ? "    " : "│   "), true);
+        }
+    }
+
+
 
     public Node getRoot() {
         return root;
