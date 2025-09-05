@@ -36,10 +36,17 @@ public class RedBlackTree {
          * */
 
         Node y = x.getRight();
-        y.setParent(x.getParent());
         x.setRight(y.getLeft());
         if (y.getLeft() != NIL) {
             y.getLeft().setParent(x);
+        }
+        y.setParent(x.getParent());
+        if (x.getParent() == null) {
+            root = y;
+        } else if (x == x.getParent().getLeft()) {
+            x.getParent().setLeft(y);
+        } else {
+            x.getParent().setRight(y);
         }
         y.setLeft(x);
         x.setParent(y);
@@ -52,10 +59,17 @@ public class RedBlackTree {
          * */
 
         Node y = x.getLeft();
-        y.setParent(x.getParent());
         x.setLeft(y.getRight());
         if (y.getRight() != NIL) {
             y.getRight().setParent(x);
+        }
+        y.setParent(x.getParent());
+        if (x.getParent() == null) {
+            root = y;
+        } else if (x == x.getParent().getRight()) {
+            x.getParent().setRight(y);
+        } else {
+            x.getParent().setLeft(y);
         }
         y.setRight(x);
         x.setParent(y);
@@ -92,6 +106,7 @@ public class RedBlackTree {
         Node newNode = new Node(data);
         newNode.setLeft(NIL);
         newNode.setRight(NIL);
+        newNode.setColor(Node.RED);
 
         if (root == NIL) {
             newNode.setColor(Node.BLACK);
@@ -112,10 +127,12 @@ public class RedBlackTree {
         }
 
         newNode.setParent(parent);
-        if (newNode.getData() < parent.getData()) {
-            parent.setLeft(newNode);
-        } else {
-            parent.setRight(newNode);
+        if (parent != NIL) {
+            if (newNode.getData() < parent.getData()) {
+                parent.setLeft(newNode);
+            } else {
+                parent.setRight(newNode);
+            }
         }
 
         // Fix the tree
@@ -301,6 +318,9 @@ public class RedBlackTree {
          */
         //property 1: Every node is either red or black is always true with our data structure
         //property 2: the root is black        
+        if (root == NIL || root == null) {
+            return true; // An empty tree is a valid red-black tree
+        }
         if (root.getColor() != Node.BLACK) {
             return false;
         }
@@ -325,7 +345,7 @@ public class RedBlackTree {
     }
 
     public boolean checkProperty4(Node node, int blackCount, int pathBlackCount) {
-        if (node == NIL) {
+        if (node == NIL || node == null) {
             return blackCount == pathBlackCount;
         }
         if (node.getColor() == Node.BLACK) {
@@ -336,22 +356,16 @@ public class RedBlackTree {
     }
 
     public boolean checkProperty3(Node node) {
-        boolean colour = node.getColor();
-        if (node == NIL) {
+        if (node == NIL || node == null) {
             return true;
         }
-
-        else if (colour == Node.RED) {
-            if (node.getLeft().getColor() == Node.RED || node.getRight().getColor() == Node.RED) {
+        if (node.getColor() == Node.RED) {
+            if ((node.getLeft() != NIL && node.getLeft().getColor() == Node.RED) ||
+                (node.getRight() != NIL && node.getRight().getColor() == Node.RED)) {
                 return false;
             }
-            else {
-                return this.checkProperty3(node.getLeft()) && this.checkProperty3(node.getRight());
-            }
         }
-        else {
-            return this.checkProperty3(node.getLeft()) && this.checkProperty3(node.getRight());
-        }
+        return checkProperty3(node.getLeft()) && checkProperty3(node.getRight());
     }
     
     public void print(Node node) {
@@ -386,10 +400,6 @@ public class RedBlackTree {
     public void setNIL(Node NIL) {
         this.NIL = NIL;
     }
-
-    
-    
-
 
 
 }
