@@ -67,7 +67,6 @@ public class BSTTree {
     public void delete(int data) {
         Node nodeToDelete = searchNode(root, data);
         if (nodeToDelete == NIL) {
-            System.out.println("Value " + data + " not found in the tree.");
             return;
         }
 
