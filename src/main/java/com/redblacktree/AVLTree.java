@@ -155,7 +155,6 @@ public class AVLTree {
     public void delete(int data) {
         NodeAVL nodeToDelete = search(data);
         if (nodeToDelete == NIL) {
-            System.out.println("Value " + data + " not found in the tree.");
             return;
         }
 

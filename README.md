@@ -19,6 +19,7 @@ It includes JUnit tests and a real-life comparison between them. Documentation o
   - `NodeRB.java` — Node class for Red-Black Tree.  
   - `BSTTree.java` — Standard binary search tree implementation.  
   - `Node.java` — Node class for BST.
+  - `Benchmark.java` — Class to compare the speed of the different trees.
 
 - **Tests (`src/test/java`)**  
   - `AVLTreeTest.java` — JUnit tests for AVL Tree operations, including stress tests and balance checks.  
@@ -29,6 +30,7 @@ It includes JUnit tests and a real-life comparison between them. Documentation o
   - `redblacktree_explanation.md` — Detailed explanation of Red-Black Trees: how they work, their properties, and comparison to other data structures.  
   - `insertion.md` — Step-by-step explanation of insertion operations in Red-Black Trees.  
   - `deletion.md` — Step-by-step explanation of deletion operations in Red-Black Trees.
+  - `benchmark.md` — Comparison of the different trees with real-time execution results
 
 
 ---
@@ -44,3 +46,6 @@ mvn compile
 
 # Run tests
 mvn test
+
+# To compare execution time
+mvn exec:java -Dexec.mainClass="com.redblacktree.Benchmark"
